@@ -1,0 +1,15 @@
+{
+  "name": "nevnoc",
+  "private": true,
+  "description": "Nevnoc — Global Web Solutions™ (PERN stack: PostgreSQL, Express, React + Vite, Node)",
+  "scripts": {
+    "install:all": "npm install && npm install --prefix client && npm install --prefix server",
+    "dev": "concurrently -n server,client -c cyan,blue \"npm run dev --prefix server\" \"npm run dev --prefix client\"",
+    "build": "npm run build --prefix client",
+    "start": "npm start --prefix server",
+    "db:init": "npm run db:init --prefix server"
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.6"
+  }
+}
