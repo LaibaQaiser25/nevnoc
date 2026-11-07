@@ -1,4 +1,6 @@
--- Enquiries sent from the website contact form.
+// Enquiries sent from the website contact form.
+// Kept in JS (not a .sql file) so serverless bundlers always include it.
+export const schema = `
 CREATE TABLE IF NOT EXISTS enquiries (
   id          SERIAL PRIMARY KEY,
   name        VARCHAR(120)  NOT NULL,
@@ -7,3 +9,4 @@ CREATE TABLE IF NOT EXISTS enquiries (
   automate    TEXT          NOT NULL,
   created_at  TIMESTAMPTZ   NOT NULL DEFAULT NOW()
 );
+`

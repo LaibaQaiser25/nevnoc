@@ -1,86 +1,63 @@
-# Putting nevnoc.com live
+# Putting nevnoc.com live (Vercel)
 
-The site is one Node app: Express serves the React site and the `/api` that stores contact-form enquiries in PostgreSQL.
+On Vercel the React site is served as static files, and the contact form runs as two serverless functions in `/api` (`contact.js`, `health.js`). They share their logic with the local Express server in `server/`, so local development doesn't change. Settings live in `vercel.json`.
 
-| Piece | Service | Why |
-| --- | --- | --- |
-| Website + API | **Render** (Web Service) | Deploys straight from GitHub on every push, free HTTPS, custom domains |
-| Database | **Neon** (PostgreSQL) | Free tier that doesn't expire |
-| Domain | Your registrar (where you bought nevnoc.com) | Points the domain to Render |
+| Piece | Service |
+| --- | --- |
+| Website + `/api` functions | **Vercel** |
+| Database | **Neon** PostgreSQL, added from inside Vercel |
+| Domain | Your registrar (where you bought nevnoc.com) |
 
-Check each service's current pricing page before you choose a plan.
+> **Plan note:** Vercel's free *Hobby* plan is for personal, non-commercial projects. Nevnoc is a business site, so check Vercel's current terms; you may need the *Pro* plan.
 
 ---
 
-## 1. Create the database (Neon, about 3 minutes)
+## 1. Import the project (about 3 minutes)
 
-1. Sign up at **neon.tech** (Sign in with GitHub works).
-2. Create a project named `nevnoc`. Pick the region closest to your Render region (for example Singapore or Frankfurt).
-3. Copy the **connection string**. It looks like
-   `postgresql://user:password@ep-xxxx.region.aws.neon.tech/neondb?sslmode=require`
-   Keep it private: it's the password to your database.
+1. Sign up at **vercel.com** with your GitHub account.
+2. Click **Add New → Project** and import **LaibaQaiser25/nevnoc**.
+3. Leave the settings as they are. `vercel.json` already sets the install command, build command and output folder (`client/dist`).
+   Framework Preset can stay on **Other**.
+4. Click **Deploy**. The site will load, but the contact form won't work until step 2.
 
-You don't need to create any tables. The app creates them itself on first start.
+## 2. Add the database (about 3 minutes)
 
-## 2. Deploy the site (Render, about 5 minutes)
+1. In your Vercel project, open the **Storage** tab, then **Create Database**, then choose **Neon** (Postgres).
+2. Accept the defaults, pick a region close to you (for example Singapore or Frankfurt), and **connect it to the nevnoc project** for all environments.
+   This adds a `DATABASE_URL` environment variable automatically.
+3. Go to **Deployments**, click **⋯** on the latest deployment, then **Redeploy**, so the functions pick up `DATABASE_URL`.
+4. Check:
+   - `https://<your-project>.vercel.app/api/health` shows `"db":"connected"`
+   - Sending the contact form on the site shows "Thank you!"
 
-1. Sign up at **render.com** with your GitHub account.
-2. Click **New → Web Service**, then pick the **LaibaQaiser25/nevnoc** repository.
-3. Fill in:
-
-   | Setting | Value |
-   | --- | --- |
-   | Name | `nevnoc` |
-   | Branch | `main` |
-   | Root Directory | *(leave empty)* |
-   | Runtime / Language | Node |
-   | Build Command | `npm run deploy:build` |
-   | Start Command | `npm start` |
-   | Health Check Path | `/api/health` (under *Advanced*) |
-
-4. **Instance type:**
-   - **Free:** works, but the site goes to sleep after a period with no visitors, and the next visitor waits up to about a minute.
-   - **Starter (paid):** recommended for a business site, because it never sleeps.
-5. **Environment variables:** add these two:
-
-   | Key | Value |
-   | --- | --- |
-   | `NODE_ENV` | `production` |
-   | `DATABASE_URL` | *(the Neon connection string from step 1)* |
-
-6. Click **Create Web Service** and wait for the build to finish (2–4 minutes).
-7. Open the `https://nevnoc.onrender.com` link Render gives you and check:
-   - the site loads
-   - `https://nevnoc.onrender.com/api/health` shows `"db":"connected"`
-   - sending the contact form shows "Thank you!"
+You don't need to create any tables. The first enquiry creates the `enquiries` table automatically.
 
 ## 3. Connect nevnoc.com (about 10 minutes, then wait for DNS)
 
-1. In Render, open the service → **Settings → Custom Domains → Add**: add `nevnoc.com`, then add `www.nevnoc.com`.
-2. Render shows the **DNS records** to create. Usually:
-   - an **A** record for `@` (the root domain) pointing to Render's IP address
-   - a **CNAME** record for `www` pointing to `nevnoc.onrender.com`
+1. In Vercel, open the project and go to **Settings → Domains**. Add `nevnoc.com`. When asked, also add `www.nevnoc.com` and redirect it to `nevnoc.com`.
+2. Vercel shows the **DNS records** to add. Usually:
+   - an **A** record for `@` pointing to Vercel's IP address
+   - a **CNAME** record for `www` pointing to Vercel's address
 
-   **Use the exact values Render shows you.**
-3. Log in to your domain registrar (GoDaddy, Namecheap, Hostinger, etc.) → **DNS settings** for nevnoc.com:
+   **Use the exact values Vercel shows you.**
+3. Log in to your domain registrar → **DNS settings** for nevnoc.com:
    - Delete any existing **A**, **AAAA** or **CNAME** records for `@` and `www`. Registrars often add "parking" records by default.
-   - Add the records from Render.
-4. Back in Render, click **Verify**. DNS changes usually take a few minutes, but can take up to 24–48 hours.
-5. Render issues the HTTPS certificate automatically. When `https://nevnoc.com` loads with the padlock, you're live.
+   - Add the records from Vercel.
+4. Wait until Vercel shows **Valid Configuration**. This takes minutes, but can take up to 24–48 hours. HTTPS is set up automatically.
 
 ## 4. After launch
 
-- **Google Search Console** (search.google.com/search-console): add `nevnoc.com`, verify it with the DNS record it gives you, and submit `https://nevnoc.com/sitemap.xml`.
-- **Test link previews:** paste `https://nevnoc.com` into LinkedIn's Post Inspector (linkedin.com/post-inspector). It should show the Nevnoc logo image.
+- **Google Search Console:** add `nevnoc.com`, verify it, and submit `https://nevnoc.com/sitemap.xml`.
+- **Test link previews:** paste `https://nevnoc.com` into LinkedIn's Post Inspector. It should show the Nevnoc logo image.
 - **LinkedIn company page:** set the website to `https://nevnoc.com`.
 
 ## Updating the site later
 
-Change something, commit and push to `main`. Render rebuilds and redeploys automatically.
+Commit and push to `main`. Vercel redeploys automatically. Other branches get their own preview URLs.
 
 ## Reading contact-form enquiries
 
-Enquiries are saved in the `enquiries` table. In Neon, open **SQL Editor** and run:
+In Vercel, open **Storage** → your Neon database → **Open in Neon** → **SQL Editor**, then run:
 
 ```sql
 SELECT created_at, name, email, business, automate FROM enquiries ORDER BY created_at DESC;

@@ -37,13 +37,11 @@ Everything editable is in **`client/src/content.js`**. Values in `[square bracke
 
 ## Production
 
-Hosting steps for nevnoc.com are in **[DEPLOY.md](DEPLOY.md)** (Render + Neon + your domain).
+nevnoc.com is hosted on **Vercel**: see **[DEPLOY.md](DEPLOY.md)**. There the contact form runs as serverless functions in `api/`, which share their logic with the Express server (`server/enquiries.js`).
 
-To try a production build locally:
+To try a production build locally with Express instead:
 
 ```bash
-npm run deploy:build
+npm run build
 NODE_ENV=production npm start
 ```
-
-Express serves the built site from `client/dist` together with the API, and creates the database table on startup.
