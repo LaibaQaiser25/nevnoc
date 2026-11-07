@@ -1,34 +1,103 @@
 @import "tailwindcss";
 
-@theme {
-  --font-sans: "Poppins", ui-sans-serif, system-ui, sans-serif;
-  --color-ink: #070b14;
-  --color-ink-2: #0b1220;
-  --color-card: #0f172a;
-  --color-line: #1b2740;
-  --color-snow: #e8eefc;
-  --color-mist: #8fa0c0;
-  --color-brand: #1e6bff;
-  --color-brand-cyan: #00d0ff;
+/* Dark mode follows the .dark class on <html> (set by the theme toggle). */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Brand tokens, taken from the Nevnoc logo file in Figma.
+   Light values sit on :root, dark values on .dark (the default). */
+:root {
+  --bg: #f6f9fc;
+  --surface: #ffffff;
+  --surface-2: #eef3f8;
+  --line: #d9e2ec;
+  --fg: #02060d;
+  --muted: #4a5868;
+  --accent: #00749c;        /* darker cyan so text passes contrast on white */
+  --accent-strong: #00cfff; /* button fill */
+  --on-accent: #02060d;
+  --glow: rgba(0, 207, 255, 0.16);
 }
 
-html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+.dark {
+  --bg: #02060d;
+  --surface: #08101c;
+  --surface-2: #0c1624;
+  --line: #172334;
+  --fg: #ffffff;
+  --muted: #a9b4c2;
+  --accent: #00cfff;
+  --accent-strong: #00cfff;
+  --on-accent: #02060d;
+  --glow: rgba(0, 207, 255, 0.13);
+}
 
-@utility text-grad {
-  background-image: linear-gradient(135deg, var(--color-brand), var(--color-brand-cyan));
+@theme inline {
+  --font-sans: "Poppins", ui-sans-serif, system-ui, sans-serif;
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-line: var(--line);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-accent-strong: var(--accent-strong);
+  --color-on-accent: var(--on-accent);
+  --color-mark-from: #00d4ff;
+  --color-mark-to: #1e9bff;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 5rem;
+    color-scheme: light;
+  }
+  html.dark { color-scheme: dark; }
+  body {
+    @apply bg-bg text-fg font-sans antialiased;
+    transition: background-color 0.3s, color 0.3s;
+  }
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
+}
+
+/* Soft radial glow, like the background of the logo artwork. */
+@utility glow {
+  background: radial-gradient(ellipse at center, var(--glow), transparent 65%);
+}
+
+@utility text-mark {
+  background-image: linear-gradient(180deg, var(--color-mark-from), var(--color-mark-to));
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
 }
 
-@utility bg-grad {
-  background-image: linear-gradient(135deg, var(--color-brand), var(--color-brand-cyan));
+/* Scroll-in animation (see useReveal). */
+.reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
 }
 
-.reveal { opacity: 0; transform: translateY(24px); transition: opacity .7s, transform .7s; }
-.reveal.in { opacity: 1; transform: none; }
+/* Data packet moving along the automation flow in the hero. */
+@keyframes flow {
+  0% { transform: translateY(-100%); opacity: 0; }
+  20%, 80% { opacity: 1; }
+  100% { transform: translateY(300%); opacity: 0; }
+}
+.flow-dot { animation: flow 2.4s ease-in-out infinite; }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .reveal { opacity: 1; transform: none; transition: none; }
+  .flow-dot { animation: none; opacity: 0; }
+  * { transition-duration: 0s !important; }
 }

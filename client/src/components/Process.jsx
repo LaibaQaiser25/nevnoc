@@ -1,25 +1,20 @@
-import { Section, Heading } from './Section.jsx'
-
-const steps = [
-  ['01', 'Discover', 'We learn your goals, audience and constraints.'],
-  ['02', 'Design', 'Clean, minimal interfaces with a premium finish.'],
-  ['03', 'Build', 'Performant, secure, thoroughly tested code.'],
-  ['04', 'Monitor', 'Launch, observe and improve — continuously.'],
-]
+import { steps } from '../content.js'
+import { Heading, InlineCta, Section } from './ui.jsx'
 
 export default function Process() {
   return (
     <Section id="process">
-      <Heading eyebrow="How we work">A clear, <span className="text-grad">precise</span> process</Heading>
-      <ol className="grid gap-5.5 sm:grid-cols-2 lg:grid-cols-4">
-        {steps.map(([n, title, text]) => (
-          <li key={n} className="reveal border-l-2 border-line py-1 pl-5.5">
-            <b className="text-grad text-4xl font-extrabold">{n}</b>
-            <h3 className="my-1 font-semibold">{title}</h3>
-            <p className="text-[0.95rem] text-mist">{text}</p>
+      <Heading eyebrow="How we work" title="Four simple steps" intro="Clear from the first call to launch day." />
+      <ol className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        {steps.map((s, i) => (
+          <li key={s.title} className="reveal relative rounded-2xl border border-line bg-surface p-6">
+            <span className="text-mark text-4xl font-bold">{String(i + 1).padStart(2, '0')}</span>
+            <h3 className="mb-2 mt-3 text-lg font-semibold">{s.title}</h3>
+            <p className="text-muted">{s.text}</p>
           </li>
         ))}
       </ol>
+      <InlineCta text="Step one is free." link="Book your discovery call" />
     </Section>
   )
 }

@@ -1,16 +1,66 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Nevnoc | Global Web Solutions™</title>
-    <meta name="description" content="Nevnoc — Global Web Solutions™. Secure, high-performance web, cloud and automation solutions." />
+    <title>Nevnoc | AI Agents, n8n Automation & Custom Web Apps</title>
+    <meta name="description" content="Nevnoc is a web and AI automation studio. We build AI agents, n8n workflow automations, custom web apps and fast business websites for growing businesses worldwide." />
+    <meta name="theme-color" content="#02060d" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="canonical" href="https://nevnoc.com/" />
+
+    <!-- Open Graph / social sharing -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://nevnoc.com/" />
+    <meta property="og:site_name" content="Nevnoc" />
+    <meta property="og:title" content="Nevnoc | Global web solutions" />
+    <meta property="og:description" content="AI agents, n8n workflow automation and custom web apps for growing businesses." />
+    <meta property="og:image" content="https://nevnoc.com/og-image.png" />
+    <meta property="og:image:width" content="1920" />
+    <meta property="og:image:height" content="1080" />
+    <meta property="og:image:alt" content="Nevnoc logo: Global web solutions" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Nevnoc | Global web solutions" />
+    <meta name="twitter:description" content="AI agents, n8n workflow automation and custom web apps for growing businesses." />
+    <meta name="twitter:image" content="https://nevnoc.com/og-image.png" />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "ProfessionalService",
+        "name": "Nevnoc",
+        "url": "https://nevnoc.com/",
+        "logo": "https://nevnoc.com/favicon.svg",
+        "image": "https://nevnoc.com/og-image.png",
+        "email": "laibaqaiser2005@gmail.com",
+        "slogan": "Global web solutions",
+        "description": "Web and AI automation studio: AI agents, n8n workflow automation, custom web apps and business websites.",
+        "founder": {
+          "@type": "Person",
+          "name": "Laiba Qaiser",
+          "sameAs": [
+            "https://www.linkedin.com/in/laiba-qaiser-140633313/",
+            "https://github.com/LaibaQaiser25",
+            "https://www.upwork.com/freelancers/~0183dd560c2e5e3361"
+          ]
+        },
+        "address": { "@type": "PostalAddress", "addressLocality": "Phalia", "addressRegion": "Punjab", "addressCountry": "PK" },
+        "areaServed": "Worldwide"
+      }
+    </script>
+
+    <!-- Apply the saved theme before first paint (dark is the default). -->
+    <script>
+      try {
+        if (localStorage.getItem('theme') === 'light') document.documentElement.classList.remove('dark')
+      } catch (e) {}
+    </script>
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   </head>
-  <body class="bg-ink text-snow font-sans antialiased">
+  <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>

@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url'
 import { query } from './db/index.js'
 
 const app = express()
-const PORT = process.env.PORT || 5000
+const PORT = process.env.PORT || 5050
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 app.use(cors({ origin: process.env.CLIENT_ORIGIN || 'http://localhost:5173' }))
@@ -21,24 +21,32 @@ app.get('/api/health', async (_req, res) => {
 })
 
 app.post('/api/contact', async (req, res) => {
-  const name = String(req.body?.name ?? '').trim()
-  const email = String(req.body?.email ?? '').trim()
-  const message = String(req.body?.message ?? '').trim()
+  const text = (v) => String(v ?? '').trim()
+  const name = text(req.body?.name)
+  const email = text(req.body?.email)
+  const business = text(req.body?.business)
+  const automate = text(req.body?.automate)
 
-  if (!name || !email || !message) return res.status(400).json({ error: 'All fields are required.' })
+  // Spam trap: real visitors never see the "website" field.
+  if (text(req.body?.website)) return res.status(201).json({ ok: true })
+
+  if (!name || !email || !automate) {
+    return res.status(400).json({ error: 'Please fill in your name, email and what you want to automate.' })
+  }
   if (!EMAIL_RE.test(email)) return res.status(400).json({ error: 'Please enter a valid email address.' })
-  if (name.length > 120 || email.length > 200 || message.length > 5000)
+  if (name.length > 120 || email.length > 200 || business.length > 160 || automate.length > 5000) {
     return res.status(400).json({ error: 'One or more fields are too long.' })
+  }
 
   try {
     const { rows } = await query(
-      'INSERT INTO messages (name, email, message) VALUES ($1, $2, $3) RETURNING id, created_at',
-      [name, email, message],
+      'INSERT INTO enquiries (name, email, business, automate) VALUES ($1, $2, $3, $4) RETURNING id, created_at',
+      [name, email, business || null, automate],
     )
     res.status(201).json({ ok: true, ...rows[0] })
   } catch (err) {
-    console.error('Insert failed:', err.message)
-    res.status(500).json({ error: 'Could not save your message. Please try again later.' })
+    console.error('Saving enquiry failed:', err.message)
+    res.status(500).json({ error: 'We could not send your message right now.' })
   }
 })
 

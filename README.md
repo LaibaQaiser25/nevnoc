@@ -1,40 +1,39 @@
-# Nevnoc — Global Web Solutions™
+# Nevnoc — Global web solutions
 
-Company website built on the **PERN** stack:
+Website and portfolio for Nevnoc, a web and AI automation studio.
 
-- **P**ostgreSQL: stores contact-form messages
-- **E**xpress: REST API (`server/`)
-- **R**eact + **Vite** + **Tailwind CSS v4**: frontend (`client/`)
-- **N**ode.js 20.6+ (uses the built-in `--env-file` and `--watch`)
+- **Frontend:** React + Vite + Tailwind CSS v4 (`client/`)
+- **Backend:** Node.js + Express + PostgreSQL (`server/`): stores contact-form enquiries
+- **Brand:** logo, colours and Poppins type taken from the Nevnoc Figma file. Exports are in `brand/`.
 
-## Structure
+## Run it locally
 
-```
-client/                 Vite + React + Tailwind
-  src/components/       Navbar, Hero, Services, About, Process, Contact, Footer, Logo
-  src/index.css         Tailwind import + brand theme tokens (@theme)
-server/                 Express API
-  index.js              /api/health, /api/contact (+ serves client/dist in production)
-  db/                   pg pool, schema.sql, init script
+```bash
+npm run install:all
 ```
 
-## Setup
+1. Create a PostgreSQL database (e.g. `nevnoc`).
+2. Copy `server/.env.example` to `server/.env` and set `DATABASE_URL`.
+3. Create the table, then start the API (port 5050) and the site (port 5173):
 
-1. Install dependencies:
-   ```bash
-   npm run install:all
-   ```
-2. Create a PostgreSQL database (for example `nevnoc`), then copy `server/.env.example` to `server/.env` and set `DATABASE_URL`.
-3. Create the tables:
-   ```bash
-   npm run db:init
-   ```
-4. Run the API (port 5000) and the Vite dev server (port 5173) together:
-   ```bash
-   npm run dev
-   ```
+```bash
+npm run db:init
+npm run dev
+```
 
-Vite proxies `/api/*` to the Express server during development.
+## Fill in the placeholders
+
+Everything editable is in **`client/src/content.js`**. Values in `[square brackets]` show on the site with a dashed "placeholder" style until you replace them:
+
+| Placeholder | Where |
+| --- | --- |
+| `[email]`, `[WhatsApp number]` | `site.email`, `site.whatsapp` (digits with country code) |
+| `[LinkedIn URL]`, `[GitHub URL]`, `[Upwork URL]` | `site.links` |
+| `[Loom link]` | `projects[].demo` |
+| `[screenshot 1–4]` | `caseStudy.screenshots`: put images in `client/public/` and use paths like `/factory-1.png` |
+| `[walkthrough video embed URL]` | `caseStudy.video`: an embed URL (e.g. a Loom or YouTube embed link) |
+| `[founder photo]` | `founder.photo`: e.g. `/laiba.jpg` in `client/public/` |
+| `[your domain]` | add `og:url` / canonical tags in `client/index.html` once the site is live |
 
 ## Production
 
@@ -43,4 +42,4 @@ npm run build
 NODE_ENV=production npm start
 ```
 
-Express serves the built React app from `client/dist` alongside the API.
+Express serves the built site from `client/dist` together with the API.
