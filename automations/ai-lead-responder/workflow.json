@@ -1,0 +1,279 @@
+{
+  "name": "Nevnoc | AI Lead Responder",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## AI Lead Responder\nA new lead fills in the form → Claude qualifies it (hot / warm / cold) and drafts a reply → the lead is saved to Google Sheets → the lead gets a personal reply with a booking link → you get an alert for hot leads.\n\n**Setup (5 min)**\n1. Edit **Config** with your details and booking link.\n2. Add credentials: Anthropic, Google Sheets, Gmail.\n3. In **Save to Google Sheets** paste your sheet URL. Row 1 headers:\n`Date | Name | Email | Company | Message | Score | Reason | Summary | Reply Sent`\n4. Activate, then open the form's Production URL.",
+        "height": 340,
+        "width": 420,
+        "color": 5
+      },
+      "id": "a1f0c3c2-5b1e-4f0a-9d4e-000000000001",
+      "name": "About this workflow",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [-520, -360]
+    },
+    {
+      "parameters": {
+        "formTitle": "Tell us what you need",
+        "formDescription": "Share a few details and we'll get back to you within minutes.",
+        "formFields": {
+          "values": [
+            { "fieldLabel": "Name", "placeholder": "Your full name", "requiredField": true },
+            { "fieldLabel": "Email", "fieldType": "email", "placeholder": "you@company.com", "requiredField": true },
+            { "fieldLabel": "Company", "placeholder": "Company name or website" },
+            { "fieldLabel": "Message", "fieldType": "textarea", "placeholder": "What would you like help with?", "requiredField": true }
+          ]
+        },
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "a1f0c3c2-5b1e-4f0a-9d4e-000000000002",
+      "name": "Lead form",
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [-520, 40],
+      "webhookId": "6f1d8a52-3a4b-4c1e-8f7a-2d9b5e0c1a11"
+    },
+    {
+      "parameters": {
+        "mode": "manual",
+        "assignments": {
+          "assignments": [
+            { "id": "c1", "name": "businessName", "value": "Nevnoc", "type": "string" },
+            { "id": "c2", "name": "ownerName", "value": "Laiba Qaiser", "type": "string" },
+            { "id": "c3", "name": "ownerEmail", "value": "laibaqaiser2005@gmail.com", "type": "string" },
+            { "id": "c4", "name": "bookingLink", "value": "[your booking link, e.g. https://cal.com/nevnoc/discovery]", "type": "string" },
+            { "id": "c5", "name": "services", "value": "AI agents and chatbots, n8n workflow automation, custom web apps and dashboards (PostgreSQL, Express, React, Node.js), and business websites", "type": "string" }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "a1f0c3c2-5b1e-4f0a-9d4e-000000000003",
+      "name": "Config",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [-300, 40]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=New lead from the website form:\n\nName: {{ $json.Name }}\nEmail: {{ $json.Email }}\nCompany: {{ $json.Company || 'not given' }}\nMessage: {{ $json.Message }}",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=You qualify inbound leads for {{ $json.businessName }}, a small studio that offers: {{ $json.services }}.\n\nScore the lead:\n- hot: a clear need we can solve, plus a sign they are ready (a deadline, a budget, a specific project, or asking to talk).\n- warm: relevant to our services but vague or early.\n- cold: unrelated to our services, spam, a sales pitch, or no real need.\n\nThen write the reply email they will receive, from {{ $json.ownerName }}:\n- Plain, friendly English. No more than 110 words. No buzzwords, no exclamation marks.\n- Greet them by first name and reflect their need in one sentence, so they know a person read it.\n- hot: invite them to book a free call at {{ $json.bookingLink }}.\n- warm: ask one or two short questions that would help us scope the work, then mention they can book a free call at {{ $json.bookingLink }}.\n- cold but genuine: a short, polite reply explaining what we do; no booking push.\n- spam or a sales pitch: leave reply_subject and reply_body empty.\n- Never promise prices, timelines or results.\n- Sign off with: {{ $json.ownerName }}, {{ $json.businessName }}\n\nAlso write a one-line reason for the score and a one-line summary of what they need."
+            }
+          ]
+        }
+      },
+      "id": "a1f0c3c2-5b1e-4f0a-9d4e-000000000004",
+      "name": "Qualify lead (AI)",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.5,
+      "position": [-60, 40]
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "claude-haiku-5-5",
+          "mode": "list",
+          "cachedResultName": "Claude Haiku 5.5"
+        },
+        "options": {
+          "temperature": 0.3
+        }
+      },
+      "id": "a1f0c3c2-5b1e-4f0a-9d4e-000000000005",
+      "name": "Claude",
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.3,
+      "position": [-120, 260]
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"score\": \"hot\",\n  \"reason\": \"Needs a WhatsApp booking bot and wants to start this month\",\n  \"summary\": \"Clinic wants appointment booking automated on WhatsApp\",\n  \"reply_subject\": \"Re: automating your bookings\",\n  \"reply_body\": \"Hi Sara, ...\"\n}"
+      },
+      "id": "a1f0c3c2-5b1e-4f0a-9d4e-000000000006",
+      "name": "Structured output",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [60, 260]
+    },
+    {
+      "parameters": {
+        "mode": "manual",
+        "assignments": {
+          "assignments": [
+            { "id": "p1", "name": "Date", "value": "={{ $now.toFormat('yyyy-MM-dd HH:mm') }}", "type": "string" },
+            { "id": "p2", "name": "Name", "value": "={{ $('Lead form').item.json.Name }}", "type": "string" },
+            { "id": "p3", "name": "Email", "value": "={{ $('Lead form').item.json.Email }}", "type": "string" },
+            { "id": "p4", "name": "Company", "value": "={{ $('Lead form').item.json.Company }}", "type": "string" },
+            { "id": "p5", "name": "Message", "value": "={{ $('Lead form').item.json.Message }}", "type": "string" },
+            { "id": "p6", "name": "Score", "value": "={{ ($json.output.score || 'warm').toLowerCase() }}", "type": "string" },
+            { "id": "p7", "name": "Reason", "value": "={{ $json.output.reason }}", "type": "string" },
+            { "id": "p8", "name": "Summary", "value": "={{ $json.output.summary }}", "type": "string" },
+            { "id": "p9", "name": "Reply Sent", "value": "={{ $json.output.reply_body ? 'yes' : 'no (spam)' }}", "type": "string" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a1f0c3c2-5b1e-4f0a-9d4e-000000000007",
+      "name": "Prepare lead",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [220, 40]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Leads",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": []
+        },
+        "options": {}
+      },
+      "id": "a1f0c3c2-5b1e-4f0a-9d4e-000000000008",
+      "name": "Save to Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [440, 40]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict", "version": 2 },
+          "conditions": [
+            {
+              "id": "r1",
+              "leftValue": "={{ $('Qualify lead (AI)').item.json.output.reply_body }}",
+              "rightValue": "",
+              "operator": { "type": "string", "operation": "notEmpty", "singleValue": true }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "a1f0c3c2-5b1e-4f0a-9d4e-000000000009",
+      "name": "Reply needed?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [660, -80]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Prepare lead').item.json.Email }}",
+        "subject": "={{ $('Qualify lead (AI)').item.json.output.reply_subject }}",
+        "emailType": "text",
+        "message": "={{ $('Qualify lead (AI)').item.json.output.reply_body }}",
+        "options": {
+          "appendAttribution": false,
+          "senderName": "={{ $('Config').item.json.ownerName }} | {{ $('Config').item.json.businessName }}",
+          "replyTo": "={{ $('Config').item.json.ownerEmail }}"
+        }
+      },
+      "id": "a1f0c3c2-5b1e-4f0a-9d4e-000000000010",
+      "name": "Reply to lead",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [880, -100],
+      "webhookId": "2b7e4c90-1d3f-4a5b-9c8d-7e6f5a4b3c21"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict", "version": 2 },
+          "conditions": [
+            {
+              "id": "h1",
+              "leftValue": "={{ $('Prepare lead').item.json.Score }}",
+              "rightValue": "hot",
+              "operator": { "type": "string", "operation": "equals" }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "a1f0c3c2-5b1e-4f0a-9d4e-000000000011",
+      "name": "Hot lead?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [660, 160]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Config').item.json.ownerEmail }}",
+        "subject": "=Hot lead: {{ $('Prepare lead').item.json.Name }} ({{ $('Prepare lead').item.json.Company || 'no company' }})",
+        "emailType": "text",
+        "message": "=A hot lead just came in and has already received a reply with your booking link.\n\nName: {{ $('Prepare lead').item.json.Name }}\nEmail: {{ $('Prepare lead').item.json.Email }}\nCompany: {{ $('Prepare lead').item.json.Company || '-' }}\n\nWhat they need: {{ $('Prepare lead').item.json.Summary }}\nWhy it's hot: {{ $('Prepare lead').item.json.Reason }}\n\nTheir message:\n{{ $('Prepare lead').item.json.Message }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "a1f0c3c2-5b1e-4f0a-9d4e-000000000012",
+      "name": "Alert me",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [880, 140],
+      "webhookId": "9a8b7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d"
+    }
+  ],
+  "connections": {
+    "Lead form": {
+      "main": [[{ "node": "Config", "type": "main", "index": 0 }]]
+    },
+    "Config": {
+      "main": [[{ "node": "Qualify lead (AI)", "type": "main", "index": 0 }]]
+    },
+    "Claude": {
+      "ai_languageModel": [[{ "node": "Qualify lead (AI)", "type": "ai_languageModel", "index": 0 }]]
+    },
+    "Structured output": {
+      "ai_outputParser": [[{ "node": "Qualify lead (AI)", "type": "ai_outputParser", "index": 0 }]]
+    },
+    "Qualify lead (AI)": {
+      "main": [[{ "node": "Prepare lead", "type": "main", "index": 0 }]]
+    },
+    "Prepare lead": {
+      "main": [[{ "node": "Save to Google Sheets", "type": "main", "index": 0 }]]
+    },
+    "Save to Google Sheets": {
+      "main": [[
+        { "node": "Reply needed?", "type": "main", "index": 0 },
+        { "node": "Hot lead?", "type": "main", "index": 0 }
+      ]]
+    },
+    "Reply needed?": {
+      "main": [[{ "node": "Reply to lead", "type": "main", "index": 0 }], []]
+    },
+    "Hot lead?": {
+      "main": [[{ "node": "Alert me", "type": "main", "index": 0 }], []]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": false
+  }
+}

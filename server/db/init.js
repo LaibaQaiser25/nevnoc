@@ -1,10 +1,7 @@
-import { readFile } from 'node:fs/promises'
-import { pool } from './index.js'
-
-const sql = await readFile(new URL('./schema.sql', import.meta.url), 'utf8')
+import { ensureSchema, pool } from './index.js'
 
 try {
-  await pool.query(sql)
+  await ensureSchema()
   console.log('Database schema is ready.')
 } catch (err) {
   console.error('Failed to initialise database:', err.message)

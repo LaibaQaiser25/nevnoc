@@ -37,9 +37,13 @@ Everything editable is in **`client/src/content.js`**. Values in `[square bracke
 
 ## Production
 
+Hosting steps for nevnoc.com are in **[DEPLOY.md](DEPLOY.md)** (Render + Neon + your domain).
+
+To try a production build locally:
+
 ```bash
-npm run build
+npm run deploy:build
 NODE_ENV=production npm start
 ```
 
-Express serves the built site from `client/dist` together with the API.
+Express serves the built site from `client/dist` together with the API, and creates the database table on startup.
