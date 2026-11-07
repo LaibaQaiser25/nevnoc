@@ -70,7 +70,7 @@ export const caseStudy = {
     { src: '/case-study/orders.webp', caption: 'Orders', alt: 'Orders table filtered by status, with amount, advance, balance and gate pass for each order' },
     { src: '/case-study/customer-ledger.webp', caption: 'Customer ledger', alt: 'Customer ledger showing debit, credit and outstanding debt for each customer, with record and invoice buttons' },
   ],
-  video: '[walkthrough video embed URL]',
+  video: '/case-study/walkthrough.webp',
 }
 
 export const projects = [

@@ -41,6 +41,19 @@ export default function CaseStudy() {
         <div className="space-y-4">
           {isPlaceholder(video) ? (
             <Placeholder label="Walkthrough video" icon="play" className="reveal aspect-video" />
+          ) : /\.(webp|gif)$/i.test(video) ? (
+            <figure className="reveal overflow-hidden rounded-2xl border border-line bg-surface">
+              <img
+                src={video}
+                alt={`${title}: screen recording of the dashboard, orders, ledger, analytics, cashbook and stock pages, with client details blurred`}
+                width="960"
+                height="600"
+                loading="lazy"
+                decoding="async"
+                className="aspect-[8/5] w-full object-cover"
+              />
+              <figcaption className="px-4 py-3 text-xs text-muted">Walkthrough of the live system. Client names and contact details are blurred.</figcaption>
+            </figure>
           ) : (
             <div className="reveal aspect-video overflow-hidden rounded-2xl border border-line">
               <iframe

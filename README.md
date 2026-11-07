@@ -31,7 +31,6 @@ Everything editable is in **`client/src/content.js`**. Values in `[square bracke
 | `[LinkedIn URL]`, `[GitHub URL]`, `[Upwork URL]` | `site.links` |
 | `[Loom link]` | `projects[].demo` |
 | `[screenshot 1–4]` | `caseStudy.screenshots`: put images in `client/public/` and use paths like `/factory-1.png` |
-| `[walkthrough video embed URL]` | `caseStudy.video`: an embed URL (e.g. a Loom or YouTube embed link) |
 | `[founder photo]` | `founder.photo`: e.g. `/laiba.jpg` in `client/public/` |
 | `[your domain]` | add `og:url` / canonical tags in `client/index.html` once the site is live |
 
