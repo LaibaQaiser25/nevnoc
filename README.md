@@ -3,7 +3,7 @@
 Website and portfolio for Nevnoc, a web and AI automation studio.
 
 - **Frontend:** React + Vite + Tailwind CSS v4 (`client/`)
-- **Backend:** Node.js + Express + PostgreSQL (`server/`): stores contact-form enquiries
+- **Backend:** Node.js + Express (`server/`): emails contact-form enquiries through [Resend](https://resend.com)
 - **Brand:** logo, colours and Poppins type taken from the Nevnoc Figma file. Exports are in `brand/`.
 
 ## Run it locally
@@ -12,12 +12,10 @@ Website and portfolio for Nevnoc, a web and AI automation studio.
 npm run install:all
 ```
 
-1. Create a PostgreSQL database (e.g. `nevnoc`).
-2. Copy `server/.env.example` to `server/.env` and set `DATABASE_URL`.
-3. Create the table, then start the API (port 5050) and the site (port 5173):
+1. Copy `server/.env.example` to `server/.env` and set `RESEND_API_KEY`.
+2. Start the API (port 5050) and the site (port 5173):
 
 ```bash
-npm run db:init
 npm run dev
 ```
 

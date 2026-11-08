@@ -4,8 +4,7 @@ import express from 'express'
 import cors from 'cors'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { ensureSchema } from './db/index.js'
-import { health, saveEnquiry } from './enquiries.js'
+import { health, sendEnquiry } from './enquiries.js'
 
 const app = express()
 const PORT = process.env.PORT || 5050
@@ -20,7 +19,7 @@ app.get('/api/health', async (_req, res) => {
 })
 
 app.post('/api/contact', async (req, res) => {
-  const { status, body } = await saveEnquiry(req.body)
+  const { status, body } = await sendEnquiry(req.body)
   res.status(status).json(body)
 })
 
@@ -36,5 +35,3 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 app.listen(PORT, () => console.log(`Nevnoc API listening on http://localhost:${PORT}`))
-
-ensureSchema().catch((err) => console.error('Database not ready yet:', err.message))

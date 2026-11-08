@@ -1,14 +1,13 @@
 {
   "name": "nevnoc",
   "private": true,
-  "description": "Nevnoc — Global web solutions. Website and portfolio (React + Vite + Tailwind, Express + PostgreSQL).",
+  "description": "Nevnoc — Global web solutions. Website and portfolio (React + Vite + Tailwind, Express).",
   "type": "module",
   "scripts": {
     "install:all": "npm install && npm install --prefix client && npm install --prefix server",
     "dev": "concurrently -n api,web -c cyan,blue \"npm run dev --prefix server\" \"npm run dev --prefix client\"",
     "build": "npm run build --prefix client",
-    "start": "npm start --prefix server",
-    "db:init": "npm run db:init --prefix server"
+    "start": "npm start --prefix server"
   },
   "engines": {
     "node": ">=22"

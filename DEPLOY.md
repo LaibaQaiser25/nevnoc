@@ -5,7 +5,7 @@ On Vercel the React site is served as static files, and the contact form runs as
 | Piece | Service |
 | --- | --- |
 | Website + `/api` functions | **Vercel** |
-| Database | **Neon** PostgreSQL, added from inside Vercel |
+| Contact-form email | **Resend** |
 | Domain | Your registrar (where you bought nevnoc.com) |
 
 > **Plan note:** Vercel's free *Hobby* plan is for personal, non-commercial projects. Nevnoc is a business site, so check Vercel's current terms; you may need the *Pro* plan.
@@ -20,17 +20,23 @@ On Vercel the React site is served as static files, and the contact form runs as
    Framework Preset can stay on **Other**.
 4. Click **Deploy**. The site will load, but the contact form won't work until step 2.
 
-## 2. Add the database (about 3 minutes)
+## 2. Turn on the contact form (about 10 minutes)
 
-1. In your Vercel project, open the **Storage** tab, then **Create Database**, then choose **Neon** (Postgres).
-2. Accept the defaults, pick a region close to you (for example Singapore or Frankfurt), and **connect it to the nevnoc project** for all environments.
-   This adds a `DATABASE_URL` environment variable automatically.
-3. Go to **Deployments**, click **⋯** on the latest deployment, then **Redeploy**, so the functions pick up `DATABASE_URL`.
-4. Check:
-   - `https://<your-project>.vercel.app/api/health` shows `"db":"connected"`
-   - Sending the contact form on the site shows "Thank you!"
+Each enquiry is emailed to laibaqaiser2005@gmail.com. Hit **Reply** in your inbox to answer the visitor directly.
 
-You don't need to create any tables. The first enquiry creates the `enquiries` table automatically.
+1. Sign up at **resend.com** with **laibaqaiser2005@gmail.com**.
+2. Open **API Keys → Create API Key** (permission: *Sending access*), and copy the key (it starts with `re_`).
+3. In Vercel, go to **Settings → Environment Variables** and add `RESEND_API_KEY` with that key, for all environments.
+4. Go to **Deployments**, click **⋯** on the latest deployment, then **Redeploy**.
+5. Check:
+   - `https://nevnoc.com/api/health` shows `"email":"configured"`
+   - Sending the contact form shows "Thank you!", and the email arrives (check Spam the first time)
+
+Until step 6 is done, emails come from `onboarding@resend.dev`, and Resend only delivers them to the email you signed up with.
+
+6. **Send from nevnoc.com (recommended):** in Resend, open **Domains → Add Domain** and enter `nevnoc.com`. Add the DNS records it shows (MX, TXT/SPF, DKIM) in **Cloudflare → DNS**, with the proxy set to **DNS only**, then click **Verify**.
+   Once it's verified, add `CONTACT_FROM` in Vercel with the value `Nevnoc website <hello@nevnoc.com>` and redeploy.
+   Optional: `CONTACT_TO` changes which inbox gets the enquiries.
 
 ## 3. Connect nevnoc.com (about 10 minutes, then wait for DNS)
 
@@ -54,11 +60,3 @@ You don't need to create any tables. The first enquiry creates the `enquiries` t
 ## Updating the site later
 
 Commit and push to `main`. Vercel redeploys automatically. Other branches get their own preview URLs.
-
-## Reading contact-form enquiries
-
-In Vercel, open **Storage** → your Neon database → **Open in Neon** → **SQL Editor**, then run:
-
-```sql
-SELECT created_at, name, email, business, automate FROM enquiries ORDER BY created_at DESC;
-```
